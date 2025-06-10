@@ -26,9 +26,19 @@
             <article class="main-article tool-container">
                 <h1>Sitemap.xml Generator Tool</h1>
                 <p class="tool-description">
-                    Click the button below to generate a `sitemap.xml` file. The tool will read keywords from <strong>keyword.txt</strong> and your domain from <strong>domain.txt</strong>. The sitemap will contain a maximum of 5,000 URLs.
+                    Use this tool to generate a `sitemap.xml` file. Select a range of keywords from your <strong>keyword.txt</strong> file. The maximum number of URLs in a single sitemap is 5,000.
                 </p>
                 
+                <div class="tool-settings">
+                    <div class="setting-item">
+                        <label for="start-index">Start from Keyword Number:</label>
+                        <input type="number" id="start-index" class="tool-input" value="1" min="1">
+                    </div>
+                    <div class="setting-item">
+                        <label for="end-index">End at Keyword Number:</label>
+                        <input type="number" id="end-index" class="tool-input" value="5000" min="1" max="5000">
+                    </div>
+                </div>
                 <button id="generate-btn" class="tool-button">Generate & Download sitemap.xml</button>
                 
                 <div id="status-output" class="tool-status">
@@ -49,7 +59,7 @@
         </div>
     </footer>
 
-    <script src="sitemap.js"></script>
+    <script src="tool-sitemap.js"></script>
 
 </body>
 </html>
