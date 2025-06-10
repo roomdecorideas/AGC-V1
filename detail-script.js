@@ -1,29 +1,21 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- Elemen DOM ---
     const detailTitle = document.getElementById('detail-title');
     const detailImageContainer = document.getElementById('detail-image-container');
     const detailBody = document.getElementById('detail-body');
     const relatedPostsContainer = document.getElementById('related-posts-container');
 
-    // ▼▼▼ PERUBAHAN DI SINI: Mengambil keyword dari URL Hash (#) ▼▼▼
-    // Mengambil bagian setelah #, contoh: detail.html#keyword-ini -> "keyword-ini"
-    const keywordFromHash = decodeURIComponent(window.location.hash.substring(1));
-    const keyword = keywordFromHash.replace(/-/g, ' '); // Ubah strip kembali jadi spasi
+    // ▼▼▼ PERUBAHAN DI SINI: Membaca keyword dari parameter ?q= ▼▼▼
+    // 1. Buat objek URLSearchParams untuk membaca parameter
+    const params = new URLSearchParams(window.location.search);
+    // 2. Ambil nilai dari parameter 'q'
+    const keywordFromQuery = params.get('q') || '';
+    // 3. Ubah hubung (-) kembali menjadi spasi untuk mendapatkan keyword asli
+    const keyword = keywordFromQuery.replace(/-/g, ' ');
 
     // --- Fungsi Bantuan ---
-    function capitalizeEachWord(str) {
-        if (!str) return '';
-        return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    }
-
-    function generateSeoTitle(baseKeyword) {
-        const hookWords = ['Best', 'Amazing', 'Cool', 'Inspiring', 'Creative', 'Awesome', 'Stunning', 'Beautiful', 'Unique', 'Ideas', 'Inspiration', 'Designs'];
-        const randomHook = hookWords[Math.floor(Math.random() * hookWords.length)];
-        const randomNumber = Math.floor(Math.random() * (200 - 55 + 1)) + 55;
-        const capitalizedKeyword = capitalizeEachWord(baseKeyword);
-        return `${randomNumber} ${randomHook} ${capitalizedKeyword}`;
-    }
+    function capitalizeEachWord(str) { if (!str) return ''; return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '); }
+    function generateSeoTitle(baseKeyword) { const hookWords = ['Best', 'Amazing', 'Cool', 'Inspiring', 'Creative', 'Awesome', 'Stunning', 'Beautiful', 'Unique', 'Ideas', 'Inspiration', 'Designs']; const randomHook = hookWords[Math.floor(Math.random() * hookWords.length)]; const randomNumber = Math.floor(Math.random() * (200 - 55 + 1)) + 55; const capitalizedKeyword = capitalizeEachWord(baseKeyword); return `${randomNumber} ${randomHook} ${capitalizedKeyword}`; }
 
     // --- Logika Utama ---
     if (!keyword) {
@@ -80,12 +72,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (relatedTerm.toLowerCase() === originalKeyword || relatedCount >= 8) return;
 
             relatedCount++;
-            const encodedTerm = encodeURIComponent(relatedTerm.replace(/\s/g, '-').toLowerCase());
+            
+            // ▼▼▼ PERUBAHAN DI SINI: Menggunakan format URL baru untuk related posts ▼▼▼
+            const keywordForUrl = relatedTerm.replace(/\s/g, '-').toLowerCase();
+            const linkUrl = `detail.html?q=${encodeURIComponent(keywordForUrl)}`;
+            
             const imageUrl = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(relatedTerm)}`;
-            
-            // ▼▼▼ PERUBAHAN DI SINI: Menggunakan URL Hash (#) untuk related posts ▼▼▼
-            const linkUrl = `detail.html#${encodedTerm}`;
-            
             const newRelatedTitle = generateSeoTitle(relatedTerm);
 
             const card = `
