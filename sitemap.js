@@ -12,8 +12,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         keywordList.forEach(keyword => {
             if (!keyword) return;
 
-            const encodedKeywordForUrl = encodeURIComponent(keyword.replace(/\s/g, '-').toLowerCase());
-            const loc = `${siteUrl}/detail.html#${encodedKeywordForUrl}`;
+            // ▼▼▼ PERUBAHAN DI SINI: Menggunakan format URL baru untuk sitemap ▼▼▼
+            const keywordForUrl = keyword.replace(/\s/g, '-').toLowerCase();
+            const loc = `${siteUrl}/detail.html?q=${encodeURIComponent(keywordForUrl)}`;
 
             xml += '  <url>\n';
             xml += `    <loc>${loc}</loc>\n`;
@@ -31,10 +32,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         try {
             const domainResponse = await fetch('domain.txt');
             if (!domainResponse.ok) throw new Error('File domain.txt tidak ditemukan.');
-            
-            // ▼▼▼ PERUBAHAN DI SINI: Membersihkan URL dari spasi dan / di akhir ▼▼▼
             const siteUrl = (await domainResponse.text()).trim().replace(/\/$/, '');
-            
             if (!siteUrl) throw new Error('File domain.txt kosong.');
 
             const keywordResponse = await fetch('keyword.txt');
