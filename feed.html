@@ -3,15 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RSS Feed</title>
-    <style>
-        body { font-family: monospace; background-color: #f4f4f4; margin: 0; padding: 1rem; }
-        pre { white-space: pre-wrap; word-wrap: break-word; }
-    </style>
+    <title>Feed Generator Tool | DecorInspire</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <pre id="feed-output">Generating feed, please wait...</pre>
-
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo-link"><h1 class="logo">DecorInspire</h1></a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <article class="main-article tool-container">
+                <h1>Feed.xml Generator Tool</h1>
+                <p class="tool-description">
+                    Click the button below to generate a `feed.xml` file. The tool will randomly select 50 keywords from <strong>keyword.txt</strong> to create fresh content. Your domain will be read from <strong>domain.txt</strong>.
+                </p>
+                <button id="generate-btn" class="tool-button">Generate & Download feed.xml</button>
+                <div id="status-output" class="tool-status">
+                    Status: Waiting for action...
+                </div>
+            </article>
+        </div>
+    </main>
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="about.html">About Us</a> |
+                <a href="contact.html">Contact</a> |
+                <a href="privacy.html">Privacy Policy</a>
+            </div>
+            <p>&copy; 2025 DecorInspire. All Rights Reserved.</p>
+        </div>
+    </footer>
     <script src="feed.js"></script>
 </body>
 </html>
