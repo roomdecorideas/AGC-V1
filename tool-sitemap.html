@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sitemap Generator Tool | DecorInspire</title>
+    <title>Advanced Sitemap Generator | DecorInspire</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -24,25 +24,36 @@
     <main>
         <div class="container">
             <article class="main-article tool-container">
-                <h1>Sitemap.xml Generator Tool</h1>
+                <h1>Advanced Sitemap.xml Generator</h1>
                 <p class="tool-description">
-                    Use this tool to generate a `sitemap.xml` file. Select a range of keywords from your <strong>keyword.txt</strong> file. The maximum number of URLs in a single sitemap is 5,000.
+                    Generate a `sitemap.xml` with scheduled `lastmod` dates. Select a keyword range and a date range. The script will automatically distribute the URLs evenly across the selected days.
                 </p>
-                
+
                 <div class="tool-settings">
                     <div class="setting-item">
-                        <label for="start-index">Start from Keyword Number:</label>
+                        <label for="start-index">Start from Keyword:</label>
                         <input type="number" id="start-index" class="tool-input" value="1" min="1">
                     </div>
                     <div class="setting-item">
-                        <label for="end-index">End at Keyword Number:</label>
+                        <label for="end-index">End at Keyword:</label>
                         <input type="number" id="end-index" class="tool-input" value="5000" min="1" max="5000">
+                    </div>
+                </div>
+                
+                <div class="tool-settings">
+                     <div class="setting-item">
+                        <label for="start-date">Start Date:</label>
+                        <input type="date" id="start-date" class="tool-input">
+                    </div>
+                    <div class="setting-item">
+                        <label for="end-date">End Date:</label>
+                        <input type="date" id="end-date" class="tool-input">
                     </div>
                 </div>
                 <button id="generate-btn" class="tool-button">Generate & Download sitemap.xml</button>
                 
                 <div id="status-output" class="tool-status">
-                    Status: Waiting for action...
+                    Status: Please select a date range to begin.
                 </div>
             </article>
         </div>
