@@ -3,15 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XML Sitemap</title>
-    <style>
-        body { font-family: monospace; background-color: #282c34; color: #abb2bf; margin: 0; padding: 1rem; }
-        pre { white-space: pre-wrap; word-wrap: break-word; }
-    </style>
+    <title>Sitemap Generator Tool | DecorInspire</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <pre id="sitemap-output">Generating sitemap, please wait...</pre>
+
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo-link"><h1 class="logo">DecorInspire</h1></a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <article class="main-article tool-container">
+                <h1>Sitemap.xml Generator Tool</h1>
+                <p class="tool-description">
+                    Click the button below to generate a `sitemap.xml` file. The tool will read keywords from <strong>keyword.txt</strong> and your domain from <strong>domain.txt</strong>. The sitemap will contain a maximum of 5,000 URLs.
+                </p>
+                
+                <button id="generate-btn" class="tool-button">Generate & Download sitemap.xml</button>
+                
+                <div id="status-output" class="tool-status">
+                    Status: Waiting for action...
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="about.html">About Us</a> |
+                <a href="contact.html">Contact</a> |
+                <a href="privacy.html">Privacy Policy</a>
+            </div>
+            <p>&copy; 2025 DecorInspire. All Rights Reserved.</p>
+        </div>
+    </footer>
 
     <script src="sitemap.js"></script>
+
 </body>
 </html>
