@@ -384,3 +384,47 @@ footer {
 .contact-email:hover {
     text-decoration: underline;
 }
+
+/* --- Style untuk Halaman Tool Generator --- */
+.tool-container {
+    text-align: center;
+    padding: 2rem;
+}
+
+.tool-description {
+    max-width: 600px;
+    margin: 0 auto 2rem auto;
+    color: #555;
+    line-height: 1.8;
+}
+
+.tool-button {
+    background-color: #28a745; /* Warna hijau untuk aksi positif */
+    color: #fff;
+    border: none;
+    padding: 1rem 2.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.tool-button:hover:not(:disabled) {
+    background-color: #218838;
+    transform: scale(1.05);
+}
+
+.tool-button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+
+.tool-status {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    font-family: monospace;
+    font-size: 1rem;
+}
