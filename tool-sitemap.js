@@ -11,42 +11,92 @@ document.addEventListener('DOMContentLoaded', function() {
     const endIndexInput = document.getElementById('end-index');
 
     // --- Fungsi Bantuan ---
+
+    function capitalizeEachWord(str) {
+        if (!str) return '';
+        return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+
+    function generateSeoTitle(baseKeyword) {
+        const hookWords = ['Best', 'Amazing', 'Cool', 'Inspiring', 'Creative', 'Awesome', 'Stunning', 'Beautiful', 'Unique', 'Ideas', 'Inspiration', 'Designs'];
+        const randomHook = hookWords[Math.floor(Math.random() * hookWords.length)];
+        const randomNumber = Math.floor(Math.random() * (200 - 55 + 1)) + 55;
+        const capitalizedKeyword = capitalizeEachWord(baseKeyword);
+        return `${randomNumber} ${randomHook} ${capitalizedKeyword}`;
+    }
+    
+    // ▼▼▼ FUNGSI BANTUAN BARU: Untuk menghindari error pada karakter spesial di XML ▼▼▼
+    function escapeXml(unsafe) {
+        return unsafe.replace(/[<>&'"]/g, function (c) {
+            switch (c) {
+                case '<': return '&lt;';
+                case '>': return '&gt;';
+                case '&': return '&amp;';
+                case '\'': return '&apos;';
+                case '"': return '&quot;';
+            }
+        });
+    }
+
+
+    /**
+     * ▼▼▼ FUNGSI UTAMA GENERATOR SITEMAP (DIMODIFIKASI) ▼▼▼
+     * Menghasilkan sitemap dalam format XML standar dengan tambahan ekstensi gambar.
+     * @param {Array<string>} keywordList - Daftar keyword yang akan dimasukkan ke sitemap.
+     * @param {string} siteUrl - URL dasar website.
+     * @returns {string} String XML yang lengkap.
+     */
     function generateSitemapXml(keywordList, siteUrl) {
         const today = new Date().toISOString().slice(0, 10);
+
+        // Header dari Sitemap XML, dengan tambahan namespace untuk gambar (xmlns:image)
         let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n';
+
+        // Loop untuk setiap keyword dan buat blok <url>
         keywordList.forEach(keyword => {
             if (!keyword) return;
+
             const keywordForUrl = keyword.replace(/\s/g, '-').toLowerCase();
-            const loc = `${siteUrl}/detail.html?q=${encodeURIComponent(keywordForUrl)}`;
+            const pageUrl = `${siteUrl}/detail.html?q=${encodeURIComponent(keywordForUrl)}`;
+            
+            // Siapkan data untuk blok gambar
+            const imageUrl = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(keyword)}`;
+            const imageTitle = generateSeoTitle(keyword);
+
             xml += '  <url>\n';
-            xml += `    <loc>${loc}</loc>\n`;
+            xml += `    <loc>${pageUrl}</loc>\n`;
             xml += `    <lastmod>${today}</lastmod>\n`;
             xml += '    <changefreq>daily</changefreq>\n';
             xml += '    <priority>0.7</priority>\n';
+            
+            // ▼▼▼ BLOK GAMBAR BARU DITAMBAHKAN DI SINI ▼▼▼
+            xml += '    <image:image>\n';
+            xml += `        <image:loc>${imageUrl}</image:loc>\n`;
+            xml += `        <image:title>${escapeXml(imageTitle)}</image:title>\n`;
+            xml += '    </image:image>\n';
+            
             xml += '  </url>\n';
         });
+
         xml += '</urlset>';
         return xml;
     }
 
-    // --- Logika Utama Saat Tombol Diklik ---
+    // --- Logika Utama Saat Tombol Diklik (Tidak ada perubahan di sini) ---
     generateBtn.addEventListener('click', async () => {
-        // Baca nilai input dari form
         let start = parseInt(startIndexInput.value, 10);
         let end = parseInt(endIndexInput.value, 10);
 
-        // Validasi input
         if (isNaN(start) || isNaN(end) || start < 1 || end < start) {
             statusOutput.textContent = 'Error: Invalid number range. Start number must be smaller than or equal to End number.';
             statusOutput.style.color = 'red';
             return;
         }
 
-        // Terapkan batas maksimum 5000
         if (end > MAX_URLS_LIMIT) {
             end = MAX_URLS_LIMIT;
-            endIndexInput.value = end; // Update tampilan di input box
+            endIndexInput.value = end;
             statusOutput.textContent = `Warning: End number was capped at the maximum limit of ${MAX_URLS_LIMIT}.`;
             statusOutput.style.color = 'orange';
         } else {
@@ -55,19 +105,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            // Update status dan nonaktifkan tombol
             generateBtn.disabled = true;
             generateBtn.textContent = 'Generating...';
             statusOutput.textContent = 'Status: Fetching data...';
 
-            // Ambil URL dari domain.txt
             const domainResponse = await fetch('domain.txt');
             if (!domainResponse.ok) throw new Error('Could not find domain.txt file.');
             const siteUrl = (await domainResponse.text()).trim().replace(/\/$/, '');
             if (!siteUrl) throw new Error('domain.txt file is empty.');
 
-            // Ambil keywords dari keyword.txt
-            statusOutput.textContent = 'Status: Reading keywords...';
             const keywordResponse = await fetch('keyword.txt');
             if (!keywordResponse.ok) throw new Error('Could not find keyword.txt file.');
             let allKeywords = await keywordResponse.text();
@@ -77,14 +123,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(`Start number (${start}) is greater than the total number of keywords (${allKeywords.length}).`);
             }
 
-            // Potong array keyword sesuai rentang yang dipilih pengguna
             const keywordSelection = allKeywords.slice(start - 1, end);
-            statusOutput.textContent = `Status: Generating sitemap with ${keywordSelection.length} URLs (from #${start} to #${end})...`;
+            statusOutput.textContent = `Status: Generating sitemap with ${keywordSelection.length} URLs and images...`;
 
-            // Hasilkan konten XML
             const sitemapXml = generateSitemapXml(keywordSelection, siteUrl);
 
-            // Buat file dan picu unduhan
             const blob = new Blob([sitemapXml], { type: 'application/xml;charset=utf-8' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -102,7 +145,6 @@ document.addEventListener('DOMContentLoaded', function() {
             statusOutput.textContent = `Error: ${error.message}`;
             statusOutput.style.color = 'red';
         } finally {
-            // Aktifkan kembali tombol setelah selesai
             generateBtn.disabled = false;
             generateBtn.textContent = 'Generate & Download sitemap.xml';
         }
