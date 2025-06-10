@@ -1,5 +1,7 @@
 // Setup website AGC
 
 Rubah keyword berada di file keyword.txt untuk generat konten
-Rubah link domain di domain.txt (akan berpengaruh di feed dan sitemap)
+Ganared file feed dan sitemap dengan tool yang sudah di sediakan
+-- DOMAIN-ANDA/tool-feed
+-- DOMAIN-ANDA/tool-sitemap
 Rubah link domain di robots.txt (akan berpengaruh di SEO)
