@@ -9,73 +9,46 @@ document.addEventListener('DOMContentLoaded', function() {
     const statusOutput = document.getElementById('status-output');
     const startIndexInput = document.getElementById('start-index');
     const endIndexInput = document.getElementById('end-index');
-
-    // --- Fungsi Bantuan ---
-
-    function capitalizeEachWord(str) {
-        if (!str) return '';
-        return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    }
-
-    function generateSeoTitle(baseKeyword) {
-        const hookWords = ['Best', 'Amazing', 'Cool', 'Inspiring', 'Creative', 'Awesome', 'Stunning', 'Beautiful', 'Unique', 'Ideas', 'Inspiration', 'Designs'];
-        const randomHook = hookWords[Math.floor(Math.random() * hookWords.length)];
-        const randomNumber = Math.floor(Math.random() * (200 - 55 + 1)) + 55;
-        const capitalizedKeyword = capitalizeEachWord(baseKeyword);
-        return `${randomNumber} ${randomHook} ${capitalizedKeyword}`;
-    }
-    
-    // ▼▼▼ FUNGSI BANTUAN BARU: Untuk menghindari error pada karakter spesial di XML ▼▼▼
-    function escapeXml(unsafe) {
-        return unsafe.replace(/[<>&'"]/g, function (c) {
-            switch (c) {
-                case '<': return '&lt;';
-                case '>': return '&gt;';
-                case '&': return '&amp;';
-                case '\'': return '&apos;';
-                case '"': return '&quot;';
-            }
-        });
-    }
-
+    const startDateInput = document.getElementById('start-date');
+    const endDateInput = document.getElementById('end-date');
 
     /**
-     * ▼▼▼ FUNGSI UTAMA GENERATOR SITEMAP (DIMODIFIKASI) ▼▼▼
-     * Menghasilkan sitemap dalam format XML standar dengan tambahan ekstensi gambar.
-     * @param {Array<string>} keywordList - Daftar keyword yang akan dimasukkan ke sitemap.
+     * ▼▼▼ FUNGSI GENERATOR SITEMAP (DIMODIFIKASI TOTAL) ▼▼▼
+     * @param {Array<string>} keywordList - Daftar keyword terpilih.
      * @param {string} siteUrl - URL dasar website.
+     * @param {Date} startDate - Tanggal mulai untuk publikasi.
+     * @param {number} postsPerDay - Jumlah URL yang akan dipublikasikan per hari.
      * @returns {string} String XML yang lengkap.
      */
-    function generateSitemapXml(keywordList, siteUrl) {
-        const today = new Date().toISOString().slice(0, 10);
-
-        // Header dari Sitemap XML, dengan tambahan namespace untuk gambar (xmlns:image)
+    function generateSitemapXml(keywordList, siteUrl, startDate, postsPerDay) {
         let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n';
+        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
-        // Loop untuk setiap keyword dan buat blok <url>
-        keywordList.forEach(keyword => {
+        keywordList.forEach((keyword, index) => {
             if (!keyword) return;
 
-            const keywordForUrl = keyword.replace(/\s/g, '-').toLowerCase();
-            const pageUrl = `${siteUrl}/detail.html?q=${encodeURIComponent(keywordForUrl)}`;
+            // Kalkulasi hari publikasi untuk URL saat ini
+            const dayOffset = Math.floor(index / postsPerDay);
+            const postDate = new Date(startDate);
+            postDate.setDate(postDate.getDate() + dayOffset);
+
+            // Buat waktu acak
+            const randomHour = Math.floor(Math.random() * 24);
+            const randomMinute = Math.floor(Math.random() * 60);
+            const randomSecond = Math.floor(Math.random() * 60);
+            postDate.setUTCHours(randomHour, randomMinute, randomSecond);
             
-            // Siapkan data untuk blok gambar
-            const imageUrl = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(keyword)}`;
-            const imageTitle = generateSeoTitle(keyword);
+            // Format tanggal ke standar W3C Datetime (YYYY-MM-DDTHH:mm:ss+00:00)
+            const lastmod = postDate.toISOString();
+
+            const keywordForUrl = keyword.replace(/\s/g, '-').toLowerCase();
+            const loc = `${siteUrl}/detail.html?q=${encodeURIComponent(keywordForUrl)}`;
 
             xml += '  <url>\n';
-            xml += `    <loc>${pageUrl}</loc>\n`;
-            xml += `    <lastmod>${today}</lastmod>\n`;
+            xml += `    <loc>${loc}</loc>\n`;
+            xml += `    <lastmod>${lastmod}</lastmod>\n`;
             xml += '    <changefreq>daily</changefreq>\n';
             xml += '    <priority>0.7</priority>\n';
-            
-            // ▼▼▼ BLOK GAMBAR BARU DITAMBAHKAN DI SINI ▼▼▼
-            xml += '    <image:image>\n';
-            xml += `        <image:loc>${imageUrl}</image:loc>\n`;
-            xml += `        <image:title>${escapeXml(imageTitle)}</image:title>\n`;
-            xml += '    </image:image>\n';
-            
             xml += '  </url>\n';
         });
 
@@ -83,22 +56,39 @@ document.addEventListener('DOMContentLoaded', function() {
         return xml;
     }
 
-    // --- Logika Utama Saat Tombol Diklik (Tidak ada perubahan di sini) ---
+    // --- Logika Utama Saat Tombol Diklik ---
     generateBtn.addEventListener('click', async () => {
-        let start = parseInt(startIndexInput.value, 10);
-        let end = parseInt(endIndexInput.value, 10);
+        let startNum = parseInt(startIndexInput.value, 10);
+        let endNum = parseInt(endIndexInput.value, 10);
+        const startDateVal = startDateInput.value;
+        const endDateVal = endDateInput.value;
 
-        if (isNaN(start) || isNaN(end) || start < 1 || end < start) {
-            statusOutput.textContent = 'Error: Invalid number range. Start number must be smaller than or equal to End number.';
+        // Validasi input
+        if (!startDateVal || !endDateVal) {
+            statusOutput.textContent = 'Error: Please select both a Start Date and an End Date.';
+            statusOutput.style.color = 'red';
+            return;
+        }
+        if (isNaN(startNum) || isNaN(endNum) || startNum < 1 || endNum < startNum) {
+            statusOutput.textContent = 'Error: Invalid keyword number range.';
             statusOutput.style.color = 'red';
             return;
         }
 
-        if (end > MAX_URLS_LIMIT) {
-            end = MAX_URLS_LIMIT;
-            endIndexInput.value = end;
-            statusOutput.textContent = `Warning: End number was capped at the maximum limit of ${MAX_URLS_LIMIT}.`;
-            statusOutput.style.color = 'orange';
+        const startDate = new Date(startDateVal);
+        const endDate = new Date(endDateVal);
+        if (endDate < startDate) {
+            statusOutput.textContent = 'Error: End Date cannot be earlier than Start Date.';
+            statusOutput.style.color = 'red';
+            return;
+        }
+        
+        // Terapkan batas maksimum 5000 URL
+        if ((endNum - startNum + 1) > MAX_URLS_LIMIT) {
+             endNum = startNum + MAX_URLS_LIMIT - 1;
+             endIndexInput.value = endNum;
+             statusOutput.textContent = `Warning: The range was capped at the maximum limit of ${MAX_URLS_LIMIT} URLs.`;
+             statusOutput.style.color = 'orange';
         } else {
              statusOutput.textContent = 'Status: Waiting for action...';
              statusOutput.style.color = '#333';
@@ -118,16 +108,25 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!keywordResponse.ok) throw new Error('Could not find keyword.txt file.');
             let allKeywords = await keywordResponse.text();
             allKeywords = allKeywords.split('\n').filter(k => k.trim() !== '');
-            
-            if (start > allKeywords.length) {
-                throw new Error(`Start number (${start}) is greater than the total number of keywords (${allKeywords.length}).`);
-            }
 
-            const keywordSelection = allKeywords.slice(start - 1, end);
-            statusOutput.textContent = `Status: Generating sitemap with ${keywordSelection.length} URLs and images...`;
+            if (startNum > allKeywords.length) throw new Error(`Start number (${startNum}) is greater than total keywords (${allKeywords.length}).`);
 
-            const sitemapXml = generateSitemapXml(keywordSelection, siteUrl);
+            // ▼▼▼ PERUBAHAN UTAMA: Konten diambil berurutan (tidak diacak) ▼▼▼
+            const keywordSelection = allKeywords.slice(startNum - 1, endNum);
 
+            // Menghitung jumlah hari dalam rentang (inklusif)
+            const diffTime = Math.abs(endDate - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+            // Menghitung berapa URL yang harus didistribusikan per hari
+            const postsPerDay = Math.ceil(keywordSelection.length / diffDays);
+
+            statusOutput.textContent = `Status: Processing ${keywordSelection.length} URLs over ${diffDays} days (${postsPerDay} URLs/day)...`;
+
+            // Hasilkan konten XML dengan logika baru
+            const sitemapXml = generateSitemapXml(keywordSelection, siteUrl, startDate, postsPerDay);
+
+            // Buat file dan picu unduhan
             const blob = new Blob([sitemapXml], { type: 'application/xml;charset=utf-8' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -137,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.removeChild(link);
             URL.revokeObjectURL(link.href);
 
-            statusOutput.textContent = `Status: Success! ${FILENAME} has been generated and download has started.`;
+            statusOutput.textContent = `Status: Success! ${FILENAME} generated with scheduled dates over ${diffDays} days.`;
             statusOutput.style.color = 'green';
 
         } catch (error) {
@@ -149,4 +148,9 @@ document.addEventListener('DOMContentLoaded', function() {
             generateBtn.textContent = 'Generate & Download sitemap.xml';
         }
     });
+    
+    // Set tanggal default ke hari ini
+    const today = new Date().toISOString().slice(0, 10);
+    startDateInput.value = today;
+    endDateInput.value = today;
 });
