@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Fungsi Bantuan ---
 
+    /**
+     * Mengacak urutan elemen dalam sebuah array.
+     */
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -19,11 +22,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    /**
+     * Mengubah setiap awal kata menjadi huruf kapital.
+     */
     function capitalizeEachWord(str) {
         if (!str) return '';
         return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     }
 
+    /**
+     * ▼▼▼ FUNGSI BARU UNTUK MEMBUAT JUDUL SEO ▼▼▼
+     * Membuat judul dengan format: [Angka Acak] [Hook Acak] [Keyword]
+     * @param {string} baseKeyword Keyword dasar.
+     * @returns {string} Judul baru yang sudah diformat.
+     */
     function generateSeoTitle(baseKeyword) {
         const hookWords = ['Best', 'Amazing', 'Cool', 'Inspiring', 'Creative', 'Awesome', 'Stunning', 'Beautiful', 'Unique', 'Ideas', 'Inspiration', 'Designs'];
         const randomHook = hookWords[Math.floor(Math.random() * hookWords.length)];
@@ -36,6 +48,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Fungsi Utama ---
 
+    /**
+     * Memuat dan menampilkan batch kata kunci berikutnya.
+     */
     function loadNextBatch() {
         if (isLoading) return;
         isLoading = true;
@@ -45,12 +60,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         setTimeout(() => {
             batch.forEach(keyword => {
-                const encodedTerm = encodeURIComponent(keyword.replace(/\s/g, '-').toLowerCase()); // Ubah spasi jadi strip
-                const imageUrl = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(keyword)}`;
+                const encodedTerm = encodeURIComponent(keyword);
+                const imageUrl = `https://tse1.mm.bing.net/th?q=${encodedTerm}`;
+                const linkUrl = `detail.html?q=${encodedTerm}`; 
                 
-                // ▼▼▼ PERUBAHAN DI SINI: Menggunakan URL Hash (#) ▼▼▼
-                const linkUrl = `detail.html#${encodedTerm}`; 
-                
+                // Panggil fungsi generateSeoTitle di sini
                 const newTitle = generateSeoTitle(keyword);
 
                 const cardHTML = `
@@ -77,12 +91,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 500);
     }
 
+    /**
+     * Menangani event scroll untuk infinite loading.
+     */
     function handleInfiniteScroll() {
         if ((window.innerHeight + window.scrollY) >= document.documentElement.offsetHeight - 100) {
             loadNextBatch();
         }
     }
 
+    /**
+     * Fungsi inisialisasi yang mengatur pengacakan harian.
+     */
     async function initializeDailyShuffle() {
         const today = new Date().toISOString().slice(0, 10);
         const storedDate = localStorage.getItem('shuffleDate');
@@ -115,6 +135,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    /**
+     * Memulai proses penampilan konten.
+     */
     function startDisplay() {
         if (allKeywords.length > 0) {
             loadNextBatch();
@@ -125,5 +148,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Mulai semua proses
     initializeDailyShuffle();
 });
