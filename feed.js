@@ -1,18 +1,20 @@
 document.addEventListener('DOMContentLoaded', async function() {
 
+    // --- Pengaturan Feed (Judul dan Nama Author) ---
     const feedTitle = 'DecorInspire - Latest Design Inspirations';
     const authorName = 'DecorInspire Team';
+
+    // --- Elemen DOM ---
     const feedOutputElement = document.getElementById('feed-output');
 
-    function shuffleArray(array) { /* ... (fungsi sama seperti di atas) ... */ }
-    function capitalizeEachWord(str) { /* ... (fungsi sama seperti di atas) ... */ }
-    function generateSeoTitle(baseKeyword) { /* ... (fungsi sama seperti di atas) ... */ }
-    
-    // (Salin 3 fungsi bantuan dari script.js jika perlu)
-    function shuffleArray(array){for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]]}}
-    function capitalizeEachWord(str){if(!str)return"";return str.toLowerCase().split(" ").map(word=>word.charAt(0).toUpperCase()+word.slice(1)).join(" ")}
-    function generateSeoTitle(baseKeyword){const hookWords=["Best","Amazing","Cool","Inspiring","Creative","Awesome","Stunning","Beautiful","Unique","Ideas","Inspiration","Designs"];const randomHook=hookWords[Math.floor(Math.random()*hookWords.length)];const randomNumber=Math.floor(Math.random()*(200-55+1))+55;const capitalizedKeyword=capitalizeEachWord(baseKeyword);return`${randomNumber} ${randomHook} ${capitalizedKeyword}`}
 
+    // --- Fungsi Bantuan ---
+    function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[array[i], array[j]] = [array[j], array[i]]; } }
+    function capitalizeEachWord(str) { if (!str) return ''; return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '); }
+    function generateSeoTitle(baseKeyword) { const hookWords = ['Best', 'Amazing', 'Cool', 'Inspiring', 'Creative', 'Awesome', 'Stunning', 'Beautiful', 'Unique', 'Ideas', 'Inspiration', 'Designs']; const randomHook = hookWords[Math.floor(Math.random() * hookWords.length)]; const randomNumber = Math.floor(Math.random() * (200 - 55 + 1)) + 55; const capitalizedKeyword = capitalizeEachWord(baseKeyword); return `${randomNumber} ${randomHook} ${capitalizedKeyword}`; }
+
+
+    // --- Fungsi Utama Pembuatan Feed ---
     function generateAtomFeed(keywordList, siteUrl) {
         const now = new Date();
         const updatedTime = now.toISOString();
@@ -29,8 +31,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         keywordList.forEach(keyword => {
             const title = generateSeoTitle(keyword);
             const encodedKeywordForUrl = encodeURIComponent(keyword.replace(/\s/g, '-').toLowerCase());
-            
-            // ▼▼▼ PERUBAHAN DI SINI: Menggunakan URL Hash (#) untuk link artikel ▼▼▼
             const articleUrl = `${siteUrl}/detail.html#${encodedKeywordForUrl}`;
             const imageUrl = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(keyword)}`;
             
@@ -54,7 +54,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         try {
             const domainResponse = await fetch('domain.txt');
             if (!domainResponse.ok) throw new Error('File domain.txt tidak ditemukan.');
-            const siteUrl = (await domainResponse.text()).trim();
+            
+            // ▼▼▼ PERUBAHAN DI SINI: Membersihkan URL dari spasi dan / di akhir ▼▼▼
+            const siteUrl = (await domainResponse.text()).trim().replace(/\/$/, '');
+            
             if (!siteUrl) throw new Error('File domain.txt kosong.');
 
             const keywordResponse = await fetch('keyword.txt');
