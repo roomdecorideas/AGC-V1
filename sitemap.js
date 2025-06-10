@@ -13,8 +13,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             if (!keyword) return;
 
             const encodedKeywordForUrl = encodeURIComponent(keyword.replace(/\s/g, '-').toLowerCase());
-            
-            // ▼▼▼ PERUBAHAN DI SINI: Menggunakan URL Hash (#) untuk lokasi halaman ▼▼▼
             const loc = `${siteUrl}/detail.html#${encodedKeywordForUrl}`;
 
             xml += '  <url>\n';
@@ -33,11 +31,14 @@ document.addEventListener('DOMContentLoaded', async function() {
         try {
             const domainResponse = await fetch('domain.txt');
             if (!domainResponse.ok) throw new Error('File domain.txt tidak ditemukan.');
-            const siteUrl = (await domainResponse.text()).trim();
+            
+            // ▼▼▼ PERUBAHAN DI SINI: Membersihkan URL dari spasi dan / di akhir ▼▼▼
+            const siteUrl = (await domainResponse.text()).trim().replace(/\/$/, '');
+            
             if (!siteUrl) throw new Error('File domain.txt kosong.');
 
             const keywordResponse = await fetch('keyword.txt');
-if (!keywordResponse.ok) throw new Error('File keyword.txt tidak ditemukan.');
+            if (!keywordResponse.ok) throw new Error('File keyword.txt tidak ditemukan.');
             let allKeywords = await keywordResponse.text();
             allKeywords = allKeywords.split('\n').filter(k => k.trim() !== '');
 
