@@ -1,12 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // --- Pengaturan Sitemap ---
-    const MAX_URLS = 5000;
+    const MAX_URLS_LIMIT = 5000;
     const FILENAME = 'sitemap.xml';
 
     // --- Elemen DOM ---
     const generateBtn = document.getElementById('generate-btn');
     const statusOutput = document.getElementById('status-output');
+    const startIndexInput = document.getElementById('start-index');
+    const endIndexInput = document.getElementById('end-index');
 
     // --- Fungsi Bantuan ---
     function generateSitemapXml(keywordList, siteUrl) {
@@ -28,36 +30,61 @@ document.addEventListener('DOMContentLoaded', function() {
         return xml;
     }
 
-    // --- Logika Utama ---
+    // --- Logika Utama Saat Tombol Diklik ---
     generateBtn.addEventListener('click', async () => {
+        // Baca nilai input dari form
+        let start = parseInt(startIndexInput.value, 10);
+        let end = parseInt(endIndexInput.value, 10);
+
+        // Validasi input
+        if (isNaN(start) || isNaN(end) || start < 1 || end < start) {
+            statusOutput.textContent = 'Error: Invalid number range. Start number must be smaller than or equal to End number.';
+            statusOutput.style.color = 'red';
+            return;
+        }
+
+        // Terapkan batas maksimum 5000
+        if (end > MAX_URLS_LIMIT) {
+            end = MAX_URLS_LIMIT;
+            endIndexInput.value = end; // Update tampilan di input box
+            statusOutput.textContent = `Warning: End number was capped at the maximum limit of ${MAX_URLS_LIMIT}.`;
+            statusOutput.style.color = 'orange';
+        } else {
+             statusOutput.textContent = 'Status: Waiting for action...';
+             statusOutput.style.color = '#333';
+        }
+
         try {
-            // 1. Update status dan nonaktifkan tombol
-            statusOutput.textContent = 'Status: Fetching data...';
-            statusOutput.style.color = '#333';
+            // Update status dan nonaktifkan tombol
             generateBtn.disabled = true;
             generateBtn.textContent = 'Generating...';
+            statusOutput.textContent = 'Status: Fetching data...';
 
-            // 2. Ambil URL dari domain.txt
+            // Ambil URL dari domain.txt
             const domainResponse = await fetch('domain.txt');
             if (!domainResponse.ok) throw new Error('Could not find domain.txt file.');
             const siteUrl = (await domainResponse.text()).trim().replace(/\/$/, '');
             if (!siteUrl) throw new Error('domain.txt file is empty.');
 
-            // 3. Ambil keywords dari keyword.txt
+            // Ambil keywords dari keyword.txt
             statusOutput.textContent = 'Status: Reading keywords...';
             const keywordResponse = await fetch('keyword.txt');
             if (!keywordResponse.ok) throw new Error('Could not find keyword.txt file.');
             let allKeywords = await keywordResponse.text();
             allKeywords = allKeywords.split('\n').filter(k => k.trim() !== '');
+            
+            if (start > allKeywords.length) {
+                throw new Error(`Start number (${start}) is greater than the total number of keywords (${allKeywords.length}).`);
+            }
 
-            // 4. Batasi jumlah keyword
-            const sitemapKeywords = allKeywords.slice(0, MAX_URLS);
-            statusOutput.textContent = `Status: Found ${allKeywords.length} keywords, processing ${sitemapKeywords.length} for the sitemap...`;
+            // Potong array keyword sesuai rentang yang dipilih pengguna
+            const keywordSelection = allKeywords.slice(start - 1, end);
+            statusOutput.textContent = `Status: Generating sitemap with ${keywordSelection.length} URLs (from #${start} to #${end})...`;
 
-            // 5. Hasilkan konten XML
-            const sitemapXml = generateSitemapXml(sitemapKeywords, siteUrl);
+            // Hasilkan konten XML
+            const sitemapXml = generateSitemapXml(keywordSelection, siteUrl);
 
-            // 6. Buat file dan picu unduhan
+            // Buat file dan picu unduhan
             const blob = new Blob([sitemapXml], { type: 'application/xml;charset=utf-8' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -65,8 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
-            URL.revokeObjectURL(link.href); // Membersihkan memori
+            URL.revokeObjectURL(link.href);
 
             statusOutput.textContent = `Status: Success! ${FILENAME} has been generated and download has started.`;
             statusOutput.style.color = 'green';
@@ -76,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
             statusOutput.textContent = `Error: ${error.message}`;
             statusOutput.style.color = 'red';
         } finally {
-            // 7. Aktifkan kembali tombol setelah selesai
+            // Aktifkan kembali tombol setelah selesai
             generateBtn.disabled = false;
             generateBtn.textContent = 'Generate & Download sitemap.xml';
         }
