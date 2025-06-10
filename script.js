@@ -11,31 +11,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const loader = document.getElementById('loader');
 
     // --- Fungsi Bantuan ---
-
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-    }
-
-    function capitalizeEachWord(str) {
-        if (!str) return '';
-        return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    }
-
-    function generateSeoTitle(baseKeyword) {
-        const hookWords = ['Best', 'Amazing', 'Cool', 'Inspiring', 'Creative', 'Awesome', 'Stunning', 'Beautiful', 'Unique', 'Ideas', 'Inspiration', 'Designs'];
-        const randomHook = hookWords[Math.floor(Math.random() * hookWords.length)];
-        const randomNumber = Math.floor(Math.random() * (200 - 55 + 1)) + 55;
-        const capitalizedKeyword = capitalizeEachWord(baseKeyword);
-
-        return `${randomNumber} ${randomHook} ${capitalizedKeyword}`;
-    }
-
+    function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[array[i], array[j]] = [array[j], array[i]]; } }
+    function capitalizeEachWord(str) { if (!str) return ''; return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '); }
+    function generateSeoTitle(baseKeyword) { const hookWords = ['Best', 'Amazing', 'Cool', 'Inspiring', 'Creative', 'Awesome', 'Stunning', 'Beautiful', 'Unique', 'Ideas', 'Inspiration', 'Designs']; const randomHook = hookWords[Math.floor(Math.random() * hookWords.length)]; const randomNumber = Math.floor(Math.random() * (200 - 55 + 1)) + 55; const capitalizedKeyword = capitalizeEachWord(baseKeyword); return `${randomNumber} ${randomHook} ${capitalizedKeyword}`; }
 
     // --- Fungsi Utama ---
-
     function loadNextBatch() {
         if (isLoading) return;
         isLoading = true;
@@ -45,12 +25,13 @@ document.addEventListener('DOMContentLoaded', function() {
         
         setTimeout(() => {
             batch.forEach(keyword => {
-                const encodedTerm = encodeURIComponent(keyword.replace(/\s/g, '-').toLowerCase()); // Ubah spasi jadi strip
+                // ▼▼▼ PERUBAHAN DI SINI: Membuat format URL baru ▼▼▼
+                // 1. Ganti spasi dengan hubung (-) dan ubah ke huruf kecil
+                const keywordForUrl = keyword.replace(/\s/g, '-').toLowerCase();
+                // 2. Buat link dengan format ?q=
+                const linkUrl = `detail.html?q=${encodeURIComponent(keywordForUrl)}`; 
+
                 const imageUrl = `https://tse1.mm.bing.net/th?q=${encodeURIComponent(keyword)}`;
-                
-                // ▼▼▼ PERUBAHAN DI SINI: Menggunakan URL Hash (#) ▼▼▼
-                const linkUrl = `detail.html#${encodedTerm}`; 
-                
                 const newTitle = generateSeoTitle(keyword);
 
                 const cardHTML = `
@@ -106,7 +87,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 allKeywords = keywords;
                 startDisplay();
-
             } catch (error) {
                 console.error('Error:', error);
                 contentContainer.innerHTML = `<p style="text-align:center; color:red;">${error.message}</p>`;
