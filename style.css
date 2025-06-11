@@ -467,3 +467,55 @@ footer {
         width: 100%;
     }
 }
+
+/* --- AdBlock Blocker Styles --- */
+
+.adblock-overlay {
+    position: fixed; /* Menutupi seluruh layar */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9); /* Latar belakang gelap transparan */
+    z-index: 99999;
+    display: none; /* Sembunyi secara default */
+    justify-content: center;
+    align-items: center;
+}
+
+.adblock-modal {
+    background-color: #fff;
+    padding: 2.5rem;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 500px;
+    margin: 1rem;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.4);
+}
+
+.adblock-modal svg {
+    color: #dc3545; /* Warna merah untuk ikon peringatan */
+    margin-bottom: 1rem;
+}
+
+.adblock-modal h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.adblock-modal p {
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+}
+
+.adblock-modal .tool-button {
+    width: 100%;
+    font-size: 1rem;
+    background-color: #007bff;
+}
+
+.adblock-modal .tool-button:hover {
+    background-color: #0056b3;
+}
